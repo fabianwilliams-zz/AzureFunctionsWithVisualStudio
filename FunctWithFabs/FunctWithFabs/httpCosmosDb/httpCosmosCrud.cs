@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.Azure.WebJobs.Host;
+using System.Collections.Generic;
 
 namespace FunctWithFabs.httpCosmosDb
 {
@@ -15,7 +16,7 @@ namespace FunctWithFabs.httpCosmosDb
     {
         [FunctionName("CreateAccolade")]
         public static async Task<IActionResult> CreateAccolade([HttpTrigger(AuthorizationLevel.Function, "post",
-            Route = "session")] HttpRequest req,
+            Route = "accolade")] HttpRequest req,
             [CosmosDB(
             databaseName: "FunctWithFabsDb",
             collectionName: "Accolades",
@@ -49,6 +50,20 @@ namespace FunctWithFabs.httpCosmosDb
             return acc != null
                 ? (ActionResult)new OkObjectResult(acc)
                 : new BadRequestObjectResult("Please pass a valid Accolade JSON Payload in the request body");
+        }
+
+        [FunctionName("GetAllAccolades")]
+        public static IActionResult GetAllAccolades([HttpTrigger(AuthorizationLevel.Anonymous, "get",
+            Route = "accolade")]HttpRequest req,
+        [CosmosDB(
+            databaseName: "FunctWithFabsDb",
+            collectionName: "Accolades",
+            ConnectionStringSetting = "FunctWithFabsCosmosDBConn",
+            SqlQuery = "SELECT * FROM a order by a._ts desc")] IEnumerable<ColleagueAccolade> allAccolades,
+        TraceWriter log)
+        {
+            log.Info("Getting all Accolades that are Valid...");
+            return new OkObjectResult(allAccolades);
         }
     }
 }
