@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System;
 using System.Net.Http.Headers;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace FunctionApp9
 {
@@ -118,8 +119,21 @@ namespace FunctionApp9
 
             var json = "{\"url\":\"" + $"{imageUrl}" + "\"}";
 
-            var resp = await client.PutAsync(faceUrlBase + reqParams, new StringContent(json));
+            var jsonPayload = JsonConvert.DeserializeObject(json);
+
+            //trying it with post
+            //var content = new StringContent(jsonPayload.ToString(), Encoding.UTF8, "application/json");
+            //var result = client.PostAsync(faceUrlBase + reqParams, content).Result;
+            //new try
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, faceUrlBase + reqParams);
+            request.Content = new StringContent(json,
+                                                Encoding.UTF8,
+                                                "application/json");
+
+            //var resp = await client.PutAsync(faceUrlBase + reqParams, new StringContent(json));
+            var resp = await client.SendAsync(request);
             var jsonResponse = await resp.Content.ReadAsStringAsync();
+
 
             var faces = JsonConvert.DeserializeObject<Face[]>(jsonResponse);
 
