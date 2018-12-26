@@ -94,14 +94,14 @@ namespace FunctionApp9
             }
 
             return $"For {faces.Length} detected faces:\n\n" +
-                $"- {angerCount} were angry\n" +
+                $"- {angerCount} showed anger\n" +
                 $"- {contemptCount} showed contempt\n" +
                 $"- {disgustCount} showed disgust\n" +
                 $"- {fearCount} showed fear\n" +
                 $"- {happinessCount} showed happiness\n" +
-                $"- {neutralCount} were neutral\n" +
-                $"- {sadnessCount} were sad\n" +
-                $"- {surpriseCount} were surprised.";
+                $"- {neutralCount} seemed neutral\n" +
+                $"- {sadnessCount} seemed sad\n" +
+                $"- {surpriseCount} seemed surprised.";
         }
 
         public static async Task<Face[]> GetFacialAnalysisResults(string imageUrl)
@@ -119,18 +119,11 @@ namespace FunctionApp9
 
             var json = "{\"url\":\"" + $"{imageUrl}" + "\"}";
 
-            var jsonPayload = JsonConvert.DeserializeObject(json);
-
-            //trying it with post
-            //var content = new StringContent(jsonPayload.ToString(), Encoding.UTF8, "application/json");
-            //var result = client.PostAsync(faceUrlBase + reqParams, content).Result;
-            //new try
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, faceUrlBase + reqParams);
             request.Content = new StringContent(json,
                                                 Encoding.UTF8,
                                                 "application/json");
 
-            //var resp = await client.PutAsync(faceUrlBase + reqParams, new StringContent(json));
             var resp = await client.SendAsync(request);
             var jsonResponse = await resp.Content.ReadAsStringAsync();
 
@@ -165,7 +158,9 @@ namespace FunctionApp9
                 var faces = await GetFacialAnalysisResults(imageUrl);
                 var message = ProcessFaces(faces);
 
-                log.Info($"The Payload looks like: {message}");
+                dynamic dump = JsonConvert.SerializeObject(faces);
+
+                log.Info($"The Payload looks like: {dump}");
 
                 return new OkObjectResult($"{message}");
             }

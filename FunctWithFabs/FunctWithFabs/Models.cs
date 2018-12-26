@@ -40,6 +40,12 @@ public partial class ColleagueAccolade
     [JsonProperty("officeLocation")]
     public string OfficeLocation { get; set; }
 }
+
+public class AccoladeTable : ColleagueAccolade
+{
+    public string PartitionKey { get; set; }
+    public string RowKey { get; set; }
+}
 public partial class FabsSession
 {
     [JsonProperty("id")]
