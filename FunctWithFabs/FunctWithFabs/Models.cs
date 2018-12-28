@@ -129,6 +129,8 @@ public class IncomingText
 }
 public class Selfie
 {
+    [JsonProperty("id")]
     public string Id { get; set; }
-    public string B64Payload { get; set; }
+    [JsonProperty("photoBase64")]
+    public string PhotoBase64 { get; set; }
 }
