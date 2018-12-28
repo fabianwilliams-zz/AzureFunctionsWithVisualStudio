@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net.Http;
 
-namespace FunctWithFabs.http2queue2cosmos
+namespace FunctWithFabs.http2queue2TableStor
 {
     [StorageAccount("AzureWebJobsStorage")]
     public static class Threestep
