@@ -62,32 +62,41 @@ namespace FunctWithFabs.httpText
 
         }
         */
-        public static string GetTextInfo(HttpRequest req)
+        public static IncomingText GetTextInfo(HttpRequest req)
         {
-            string txtInfo = req.Query["txt"];
-            string requestBody = new StreamReader(req.Body).ReadToEnd();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            string txtInfo = req.Query["Text"];
 
-            return txtInfo = txtInfo ?? data?.name;
+            string requestBody = new StreamReader(req.Body).ReadToEnd();
+            dynamic data = JsonConvert.DeserializeObject<IncomingText>(requestBody);
+
+
+            if (string.IsNullOrWhiteSpace(txtInfo))
+            {
+                return data;
+            }
+            else
+            {
+                //the below is used to allow the GET method which only takes the raw text to conform
+                //or cast to a IncomingText object. Be aware this hard codes English as the language
+                txtInfo = "{\"Language\": \"en\", \"Id\": \"1\",\"Text\": \"" + $"{txtInfo}" + "\"}";
+                IncomingText txtData = JsonConvert.DeserializeObject<IncomingText>(txtInfo);
+                return txtData;
+            }
         }
 
         [FunctionName("WhatDidYouSay")]
         public static async Task<IActionResult> WhatDidYouSay(
-            [HttpTrigger(AuthorizationLevel.Function, "post", 
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", 
             Route = null)] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("Functions with Fabian Text Analyisi Cog Svcs about to begin...");
+            IncomingText input = GetTextInfo(req);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            IncomingText input = JsonConvert.DeserializeObject<IncomingText>(requestBody);
-
-            //Trying it using the native client
             ITextAnalyticsClient client = new TextAnalyticsClient(new ApiKeyServiceClientCredentials())
             {
                 Endpoint = "https://eastus2.api.cognitive.microsoft.com"
             };
-            //End
 
             if (string.IsNullOrWhiteSpace(input.Text))
             {
@@ -103,7 +112,7 @@ namespace FunctWithFabs.httpText
                 })).Result;
 
                 var outputItem = JsonConvert.SerializeObject(result.Documents[0].Score);
-
+                log.LogInformation($"Evauated Sentiment of thet text: \"{input.Text}\" is: {outputItem}");
                 return new OkObjectResult($"{outputItem}");
             }
         }
