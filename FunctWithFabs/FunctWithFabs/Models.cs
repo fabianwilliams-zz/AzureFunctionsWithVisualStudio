@@ -127,8 +127,8 @@ public class IncomingText
     [JsonProperty("text")]
     public string Text { get; set; }
 }
-public class Quote
+public class Selfie
 {
-    public double Score { get; set; }
     public string Id { get; set; }
+    public string B64Payload { get; set; }
 }
