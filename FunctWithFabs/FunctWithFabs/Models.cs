@@ -117,3 +117,18 @@ public class CreateSession
     [JsonProperty("review")]
     public ReviewOfSession[] Review { get; set; }
 }
+
+public class IncomingText
+{
+    [JsonProperty("id")]
+    public string Id { get; set; }
+    [JsonProperty("language")]
+    public string Language { get; set; }
+    [JsonProperty("text")]
+    public string Text { get; set; }
+}
+public class Quote
+{
+    public double Score { get; set; }
+    public string Id { get; set; }
+}
