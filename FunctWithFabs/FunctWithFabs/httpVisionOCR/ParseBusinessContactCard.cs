@@ -45,7 +45,9 @@ namespace FunctWithFabs.httpVisionOCR
                 return req.CreateResponse(HttpStatusCode.BadRequest, "Unable to parse JSON");
             }
             var results = new Results(ci.Parsers.Select(p => new { p.Name, p.Value }).ToDictionary(d => d.Name, d => d.Value), ci.UnKnown);
-
+            string logOut1 = JsonConvert.SerializeObject(results);
+            var logOut2 = JsonConvert.DeserializeObject(logOut1);
+            log.Info("The Results are: " + results.ToString());
             return req.Content == null
                 ? req.CreateResponse(HttpStatusCode.BadRequest, "Unable to parse JSON")
                 : req.CreateResponse(HttpStatusCode.OK, JsonConvert.SerializeObject(results));
